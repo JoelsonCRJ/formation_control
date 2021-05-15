@@ -3,4 +3,8 @@ legLaserTopic: distance
 posHeadTopic: pos_head_topic
 control_rate: 100
 dist_Thresh: 0.5
+move_base:
+  vel_topic: cmd_vel
+cloudwalker:
+  vel_topic: cloudwalker/cmd_vel
 

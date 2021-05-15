@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="formation_control" name="slam_and_legs_control" type="slam_and_legs_control.py" output="screen">
+	</node>
+
+</launch>
