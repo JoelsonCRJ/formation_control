@@ -9,10 +9,8 @@ from std_msgs.msg import Float32
 import math
 import numpy as np
 # from sklearn.cluster import DBSCAN
-import matplotlib.pyplot as plt
 import math
 import time
-
 class LegL_SLAM():
 	def __init__(self):
 		self.rospy = rospy
@@ -26,10 +24,10 @@ class LegL_SLAM():
 		return
 
 	def initParameters(self):
-		self.move_base_vel_topic = self.rospy.get_param("~move_base/vel_topic","/cmd_vel")
+		self.move_base_vel_topic = self.rospy.get_param("~move_base/vel_topic","/cloudwalker/cmd_vel")
 		self.legLaserTopic = self.rospy.get_param("~legLaser_topic","/distance")        
-		self.velTopic = self.rospy.get_param("~cloudwalker/vel_topic","cloudwalker/cmd_vel")
-		self.controlRate = self.rospy.get_param("~control_rate", 100)
+		self.velTopic = self.rospy.get_param("~cloudwalker/vel_topic","/cmd_vel")
+		self.controlRate = self.rospy.get_param("~control_rate", 20.0)
 		self.dist_Thresh = self.rospy.get_param("~dist_Thresh", 0.5)
 		return
 

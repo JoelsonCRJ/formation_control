@@ -4,4 +4,12 @@
   <node pkg="formation_control" name="slam_and_legs_control" type="slam_and_legs_control.py" output="screen">
 	</node>
 
+  <include file="$(find leg_monitoring)/launch/lite_leg_monitoring.launch">
+  </include>
+
+  <include file="$(find path_generator)/launch/goals_from_csv.launch">
+  </include>
+  
+
+
 </launch>
