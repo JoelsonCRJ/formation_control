@@ -28,7 +28,7 @@ class LegL_SLAM():
 		self.legLaserTopic = self.rospy.get_param("~legLaser_topic","/distance")        
 		self.velTopic = self.rospy.get_param("~cloudwalker/vel_topic","/cmd_vel")
 		self.controlRate = self.rospy.get_param("~control_rate", 20.0)
-		self.dist_Thresh = self.rospy.get_param("~dist_Thresh", 0.5)
+		self.dist_Thresh = self.rospy.get_param("~dist_Thresh", 0.60)
 		return
 
 	def initPublishers(self):
@@ -60,20 +60,25 @@ class LegL_SLAM():
 		self.change = True
 	
 	def allow_move_base(self):
-		if self.mediaX > self.dist_Thresh:
+		if(self.mediaX==0.0):
 			self.move_base_cmd_msg.linear.x=0*self.move_base_cmd_msg.linear.x
 			self.move_base_cmd_msg.angular.z=0*self.move_base_cmd_msg.angular.z
 		else:
-			base_distance = self.dist_Thresh-self.mediaX
-			if(base_distance>0.0 and base_distance <=0.2):
-				proportional_gain = (1/self.users_activity_range)*base_distance	
-				self.move_base_cmd_msg.linear.x=proportional_gain*self.move_base_cmd_msg.linear.x
-				self.move_base_cmd_msg.angular.z=proportional_gain*self.move_base_cmd_msg.angular.z
+			if (self.mediaX > self.dist_Thresh):
+				self.move_base_cmd_msg.linear.x=0*self.move_base_cmd_msg.linear.x
+				self.move_base_cmd_msg.angular.z=0*self.move_base_cmd_msg.angular.z
+			else:
+				base_distance = abs(self.dist_Thresh-self.mediaX)
+				if(base_distance>0.0 and base_distance <=self.users_activity_range):
+					proportional_gain = (1/self.users_activity_range)*base_distance	
+					self.move_base_cmd_msg.linear.x=proportional_gain*self.move_base_cmd_msg.linear.x
+					self.move_base_cmd_msg.angular.z=proportional_gain*self.move_base_cmd_msg.angular.z
+				
+
 		return
 
 	def mainControl(self):
 		while not self.rospy.is_shutdown():
-			self.msg = Float32()
 			# Se o Laser nao identifica, ele retorna 0
 			if self.change:	
 				# Se o Laser identificou alguma coisa	
