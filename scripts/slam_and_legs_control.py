@@ -28,7 +28,8 @@ class LegL_SLAM():
 		self.legLaserTopic = self.rospy.get_param("~legLaser_topic","/distance")        
 		self.velTopic = self.rospy.get_param("~cloudwalker/vel_topic","/cmd_vel")
 		self.controlRate = self.rospy.get_param("~control_rate", 20.0)
-		self.dist_Thresh = self.rospy.get_param("~dist_Thresh", 0.60)
+		# self.dist_Thresh = self.rospy.get_param("~dist_Thresh", 0.6)
+		# self.controlRate = self.rospy.get_param("~control_rate", 20.0)
 		return
 
 	def initPublishers(self):
@@ -47,7 +48,8 @@ class LegL_SLAM():
 		self.move_base_cmd_msg=Twist()
 		self.change = False
 		self.mediaX = 0.0
-		self.users_activity_range=0.2
+		self.dist_Thresh = self.rospy.get_param("~dist_Thresh", 0.65)
+		self.users_activity_range=0.20
 		return
 	
 	def callback_movebase(self,msg):
@@ -58,6 +60,10 @@ class LegL_SLAM():
 
 		self.mediaX = msg.data
 		self.change = True
+	
+	def sigmoid(self,x,beta):
+		y=1/((1+((x/(1-x))**-beta)))
+		return y
 	
 	def allow_move_base(self):
 		if(self.mediaX==0.0):
@@ -70,11 +76,10 @@ class LegL_SLAM():
 			else:
 				base_distance = abs(self.dist_Thresh-self.mediaX)
 				if(base_distance>0.0 and base_distance <=self.users_activity_range):
-					proportional_gain = (1/self.users_activity_range)*base_distance	
+					normalized_gain = (1/self.users_activity_range)*base_distance	
+					proportional_gain= self.sigmoid(normalized_gain,2)
 					self.move_base_cmd_msg.linear.x=proportional_gain*self.move_base_cmd_msg.linear.x
 					self.move_base_cmd_msg.angular.z=proportional_gain*self.move_base_cmd_msg.angular.z
-				
-
 		return
 
 	def mainControl(self):
